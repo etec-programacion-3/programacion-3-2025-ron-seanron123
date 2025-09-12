@@ -9,8 +9,8 @@ class Product(Base):
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     price = Column(Float, nullable=False)
-    stock = Column(Integer, default=0)
+    stock = Column(Integer, default=0, nullable=False)
     imageURL = Column(String, nullable=True)
 
-    category_id = Column(Integer, ForeignKey("categories.id"))
-    category = relationship("Category", back_populates="products")
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
+    category = relationship("Category", back_populates="products")  # comentar si no hay modelo Category aún
