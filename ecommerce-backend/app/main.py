@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from app.database import Base, engine
-from app.models.models import Product, Category
+from app.routes import product_routes
 
-app = FastAPI()
+app = FastAPI(title="API E-commerce")
 
-# Crear las tablas si no existen
-Base.metadata.create_all(bind=engine)
-
+# Ruta raíz
 @app.get("/")
-def read_root():
+def root():
     return {"message": "API de E-commerce activa"}
+
+# Registrar rutas de productos
+app.include_router(product_routes.router)
