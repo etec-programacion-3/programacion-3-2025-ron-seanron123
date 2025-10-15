@@ -5,7 +5,7 @@ from app.models.models import Product
 from app.schemas.products import ProductCreate, ProductResponse
 
 router = APIRouter(
-    prefix = "/api/productos",
+    prefix = "/api/products",
     tags = ["products"]
 )
 

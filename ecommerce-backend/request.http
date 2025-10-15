@@ -1,20 +1,72 @@
-# =====================================================
-# LISTAR TODOS LOS PRODUCTOS
-GET http://127.0.0.1:8000/api/products/
+### =====================================================
+### CATEGORÍAS
+### =====================================================
+
+# Crear nueva categoría - Ropa
+POST http://127.0.0.1:8000/api/categories/
+Content-Type: application/json
+
+{
+  "name": "Ropa2025.1"
+}
+
+###
+
+# Crear nueva categoría - Calzado
+POST http://127.0.0.1:8000/api/categories/
+Content-Type: application/json
+
+{
+  "name": "Calzado2025"
+}
+
+###
+
+# Crear nueva categoría - Accesorios
+POST http://127.0.0.1:8000/api/categories/
+Content-Type: application/json
+
+{
+  "name": "Accesorios2025"
+}
+
+###
+
+# Listar todas las categorías
+GET http://127.0.0.1:8000/api/categories/
 Accept: application/json
 
-# =====================================================
-# OBTENER UN PRODUCTO POR ID
-GET http://127.0.0.1:8000/api/products/1
+###
+
+# Obtener categoría por ID
+GET http://127.0.0.1:8000/api/categories/1
 Accept: application/json
 
-# =====================================================
-# CREAR UN PRODUCTO NUEVO
+###
+
+# Actualizar categoría
+PUT http://127.0.0.1:8000/api/categories/1
+Content-Type: application/json
+
+{
+  "name": "Ropa Modificada2025"
+}
+
+###
+
+# Eliminar categoría
+DELETE http://127.0.0.1:8000/api/categories/3
+
+### =====================================================
+### PRODUCTOS
+### =====================================================
+
+# Crear producto nuevo
 POST http://127.0.0.1:8000/api/products/
 Content-Type: application/json
 
 {
-  "name": "Remera Estampada",
+  "name": "Remera Estampada2025",
   "description": "Remera de algodón con estampado",
   "price": 25.99,
   "stock": 40,
@@ -22,66 +74,49 @@ Content-Type: application/json
   "category_id": 1
 }
 
-# =====================================================
-# ACTUALIZAR UN PRODUCTO
+###
+
+# Crear otro producto
+POST http://127.0.0.1:8000/api/products/
+Content-Type: application/json
+
+{
+  "name": "Zapatillas Deportivas2025",
+  "description": "Zapatillas cómodas para correr",
+  "price": 75.50,
+  "stock": 20,
+  "imageURL": "https://example.com/zapatillas.jpg",
+  "category_id": 2
+}
+
+###
+
+# Listar todos los productos
+GET http://127.0.0.1:8000/api/products/
+Accept: application/json
+
+###
+
+# Obtener producto por ID
+GET http://127.0.0.1:8000/api/products/1
+Accept: application/json
+
+###
+
+# Actualizar producto
 PUT http://127.0.0.1:8000/api/products/1
 Content-Type: application/json
 
 {
-  "name": "Remera Modificada",
+  "name": "Remera Modificada2025",
+  "description": "Remera de algodón modificada",
   "price": 27.99,
-  "stock": 35
-}
-
-# =====================================================
-# ELIMINAR UN PRODUCTO
-DELETE http://127.0.0.1:8000/api/products/1
-
-
-# =====================================================
-# LISTAR TODAS LAS CATEGORÍAS
-GET http://127.0.0.1:8000/api/categories/
-Accept: application/json
-
-# =====================================================
-# OBTENER UNA CATEGORÍA POR ID
-GET http://127.0.0.1:8000/api/categories/1
-Accept: application/json
-
-# =====================================================
-# CREAR NUEVAS CATEGORÍAS
-POST http://127.0.0.1:8000/api/categories/
-Content-Type: application/json
-
-{
-  "name": "Ropa"
+  "stock": 35,
+  "imageURL": "https://example.com/remera_modificada.jpg",
+  "category_id": 1
 }
 
 ###
-POST http://127.0.0.1:8000/api/categories/
-Content-Type: application/json
 
-{
-  "name": "Calzado"
-}
-
-###
-POST http://127.0.0.1:8000/api/categories/
-Content-Type: application/json
-
-{
-  "name": "Accesorios"
-}
-
-# =====================================================
-# ACTUALIZAR UNA CATEGORÍA
-PUT http://127.0.0.1:8000/api/categories/1
-Content-Type: application/json
-
-{
-  "name": "Ropa Modificada"
-}
-
-# =====================================================
-# ELIMINAR UNA CATEGORÍA
-DELETE http://127.0.0.1:8000/api/categories/3
+# Eliminar producto
+DELETE http://127.0.0.1:8000/api/products/9
