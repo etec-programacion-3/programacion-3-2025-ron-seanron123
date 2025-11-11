@@ -7,7 +7,7 @@ POST http://127.0.0.1:8000/api/categories/
 Content-Type: application/json
 
 {
-  "name": "Ropa2025.1"
+  "name": "Ropa2025.2"
 }
 
 ###
@@ -66,8 +66,8 @@ POST http://127.0.0.1:8000/api/products/
 Content-Type: application/json
 
 {
-  "name": "Remera Estampada2025",
-  "description": "Remera de algodón con estampado",
+  "name": "Remera 2025",
+  "description": "Remera de algodón",
   "price": 25.99,
   "stock": 40,
   "imageURL": "https://example.com/remera.jpg",
@@ -81,8 +81,8 @@ POST http://127.0.0.1:8000/api/products/
 Content-Type: application/json
 
 {
-  "name": "Zapatillas Deportivas2025",
-  "description": "Zapatillas cómodas para correr",
+  "name": "Zapatillas 2025",
+  "description": "Zapatillas cómodas",
   "price": 75.50,
   "stock": 20,
   "imageURL": "https://example.com/zapatillas.jpg",
