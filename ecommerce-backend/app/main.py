@@ -1,34 +1,29 @@
 from fastapi import FastAPI
-from app.routes import product_routes, category_routes, order_routes
-
-app = FastAPI(
-    title="E-commerce API",
-    description="API para gestión de productos, categorías y pedidos",
-    version="1.0.0"
-)
-
-# 🔹 Rutas de productos
-app.include_router(product_routes.router)
-
-# 🔹 Rutas de categorías
-app.include_router(category_routes.router)
-
-# 🔹 Rutas de pedidos / carrito
-app.include_router(order_routes.router)
-
-# 🔹 Ruta de prueba
-@app.get("/")
-def root():
-    return {"message": "API E-commerce funcionando correctamente"}
 from fastapi.middleware.cors import CORSMiddleware
 
+# Importar las rutas
+from app.routes.product_routes import router as product_router
+from app.routes.category_routes import router as category_router
+from app.routes.order_routes import router as order_router
+from app.routes.user_routes import router as user_router
+
+app = FastAPI()
+
+# Habilitar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # o ["http://localhost:3000"]
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-from app.routes import user_routes
 
-app.include_router(user_routes.router)
+# Registrar las rutas
+app.include_router(product_router)
+app.include_router(category_router)
+app.include_router(order_router)
+app.include_router(user_router)
+
+@app.get("/")
+def root():
+    return {"message": "Backend funcionando correctamente"}
