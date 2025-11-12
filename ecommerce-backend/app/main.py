@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes import auth_routes
 
 # Importar las rutas
 from app.routes.product_routes import router as product_router
@@ -23,6 +24,7 @@ app.include_router(product_router)
 app.include_router(category_router)
 app.include_router(order_router)
 app.include_router(user_router)
+app.include_router(auth_routes.router)
 
 @app.get("/")
 def root():
