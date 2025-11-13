@@ -1,135 +1,197 @@
+// ...existing code...
+// ------------------------------
+// VARIABLES GLOBALES
+// ------------------------------
 const API_URL = "http://127.0.0.1:8000/api";
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let usuario = JSON.parse(localStorage.getItem("usuario")) || null;
 
-// === LISTAR PRODUCTOS ===
-if (document.getElementById("productos")) {
-  fetch(${API_URL}/products)
-    .then(res => res.json())
-    .then(data => {
-      const contenedor = document.getElementById("productos");
-      data.forEach(p => {
-        const card = document.createElement("div");
-        card.classList.add("card");
-        card.innerHTML = `
-          <h3>${p.name}</h3>
-          <p>${p.description}</p>
-          <p><strong>$${p.price}</strong></p>
-          <button onclick="agregarAlCarrito(${p.id}, '${p.name}', ${p.price})">Agregar al carrito</button>
-        `;
-        contenedor.appendChild(card);
-      });
-    })
-    .catch(err => console.error("Error al obtener productos:", err));
+// ------------------------------
+// INDEX.HTML - MOSTRAR PRODUCTOS
+// ------------------------------
+async function cargarProductos() {
+    const productosDiv = document.getElementById("productos");
+    if (!productosDiv) return;
+
+    try {
+        const res = await fetch(`${API_URL}/products/`);
+        const productos = await res.json();
+
+        productosDiv.innerHTML = "";
+        productos.forEach(producto => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.innerHTML = `
+                <h3>${producto.name}</h3>
+                <img src="${producto.imageURL || 'https://via.placeholder.com/150'}" alt="${producto.name}">
+                <p>${producto.description || ""}</p>
+                <p>Precio: $${producto.price.toFixed(2)}</p>
+                <p>Stock: ${producto.stock}</p>
+                <button onclick="agregarAlCarrito(${producto.id}, '${producto.name}', ${producto.price})">Agregar al carrito</button>
+            `;
+            productosDiv.appendChild(card);
+        });
+    } catch (error) {
+        console.error("Error al cargar productos:", error);
+    }
 }
 
-// === AGREGAR AL CARRITO ===
+// ------------------------------
+// AGREGAR PRODUCTO AL CARRITO
+// ------------------------------
 function agregarAlCarrito(id, nombre, precio) {
-  const item = carrito.find(p => p.id === id);
-  if (item) {
-    item.cantidad++;
-  } else {
-    carrito.push({ id, nombre, precio, cantidad: 1 });
-  }
-  localStorage.setItem("carrito", JSON.stringify(carrito));
-  alert("Producto agregado al carrito 🛒");
+    const productoEnCarrito = carrito.find(p => p.id === id);
+    if (productoEnCarrito) {
+        productoEnCarrito.cantidad++;
+    } else {
+        carrito.push({ id, nombre, precio, cantidad: 1 });
+    }
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    alert(`${nombre} agregado al carrito`);
 }
 
-// === MOSTRAR CARRITO ===
-if (document.getElementById("carrito")) {
-  const contenedor = document.getElementById("carrito");
-  let total = 0;
-  carrito.forEach(p => {
-    const div = document.createElement("div");
-    div.innerHTML = <p>${p.nombre} x${p.cantidad} - $${p.precio * p.cantidad}</p>;
-    contenedor.appendChild(div);
-    total += p.precio * p.cantidad;
-  });
-  const totalElem = document.getElementById("total");
-  if (totalElem) totalElem.innerText = Total: $${total};
+// ------------------------------
+// CART.HTML - MOSTRAR CARRITO
+// ------------------------------
+function mostrarCarrito() {
+    const carritoDiv = document.getElementById("carrito");
+    const totalDiv = document.getElementById("total");
+    if (!carritoDiv) return;
+
+    carritoDiv.innerHTML = "";
+    let total = 0;
+
+    carrito.forEach(item => {
+        const itemDiv = document.createElement("div");
+        itemDiv.innerHTML = `
+            <p>${item.nombre} - $${item.precio.toFixed(2)} x ${item.cantidad} 
+            <button onclick="eliminarDelCarrito(${item.id})">Eliminar</button></p>
+        `;
+        carritoDiv.appendChild(itemDiv);
+        total += item.precio * item.cantidad;
+    });
+
+    if (totalDiv) totalDiv.innerText = `Total: $${total.toFixed(2)}`;
 }
 
-// === FINALIZAR COMPRA ===
-if (document.getElementById("finalizar")) {
-  document.getElementById("finalizar").addEventListener("click", async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("⚠️ Debes iniciar sesión para finalizar la compra");
-      window.location.href = "login.html";
-      return;
+function eliminarDelCarrito(id) {
+    carrito = carrito.filter(item => item.id !== id);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    mostrarCarrito();
+}
+
+// ------------------------------
+// FINALIZAR COMPRA
+// ------------------------------
+async function finalizarCompra() {
+    if (carrito.length === 0) {
+        alert("El carrito está vacío");
+        return;
     }
 
-    try {
-      const res = await fetch(${API_URL}/orders, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": Bearer ${token}
-        },
-        body: JSON.stringify({ items: carrito })
-      });
+    const orderData = {
+        items: carrito.map(item => ({ product_id: item.id, quantity: item.cantidad }))
+    };
 
-      if (res.ok) {
-        localStorage.removeItem("carrito");
-        window.location.href = "confirmacion.html";
-      } else {
-        alert("❌ Error al procesar la compra");
-      }
+    try {
+        const res = await fetch(`${API_URL}/orders/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(orderData)
+        });
+
+        if (res.ok) {
+            carrito = [];
+            localStorage.setItem("carrito", JSON.stringify(carrito));
+            window.location.href = "confirmación.html";
+        } else {
+            const error = await res.json().catch(() => ({}));
+            alert("Error al finalizar compra: " + (error.detail || JSON.stringify(error)));
+        }
     } catch (error) {
-      console.error("Error en la compra:", error);
+        console.error("Error al enviar orden:", error);
     }
-  });
 }
 
-// === LOGIN ===
-if (document.getElementById("loginForm")) {
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+// ------------------------------
+// REGISTER.HTML - REGISTRO
+// ------------------------------
+async function registrarUsuario(event) {
+    event.preventDefault();
+    const username = document.getElementById("regEmail").value;
+    const password = document.getElementById("regPassword").value;
 
     try {
-      const res = await fetch(${API_URL}/auth/login, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
+        const res = await fetch(`${API_URL}/users/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password, role: "user" })
+        });
 
-      if (res.ok) {
         const data = await res.json();
-        localStorage.setItem("token", data.token);
-        alert("✅ Inicio de sesión exitoso");
-        window.location.href = "index.html";
-      } else {
-        alert("❌ Credenciales incorrectas");
-      }
+
+        if (res.ok) {
+            alert(data.message);
+            window.location.href = "login.html";
+        } else {
+            alert(data.detail || "Error al registrar usuario");
+        }
     } catch (error) {
-      console.error("Error en login:", error);
+        console.error("Error al registrar usuario:", error);
     }
-  });
 }
 
-// === REGISTRO ===
-if (document.getElementById("registerForm")) {
-  document.getElementById("registerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("regEmail").value.trim();
-    const password = document.getElementById("regPassword").value.trim();
+// ------------------------------
+// LOGIN.HTML - LOGIN
+// ------------------------------
+async function loginUsuario(event) {
+    event.preventDefault();
+    const username = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
 
     try {
-      const res = await fetch(${API_URL}/auth/register, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
+        const res = await fetch(`${API_URL}/users/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
 
-      if (res.ok) {
-        alert("✅ Registro exitoso. Ahora inicia sesión.");
-        window.location.href = "login.html";
-      } else {
-        alert("❌ Error al registrarse (puede que el correo ya exista)");
-      }
+        const data = await res.json();
+        if (res.ok) {
+            usuario = { username, role: data.role };
+            localStorage.setItem("usuario", JSON.stringify(usuario));
+            alert(data.message);
+            window.location.href = "index.html";
+        } else {
+            alert(data.detail || "Error al iniciar sesión");
+        }
     } catch (error) {
-      console.error("Error en registro:", error);
+        console.error("Error al iniciar sesión:", error);
     }
-  });
 }
+
+// ------------------------------
+// EVENTOS
+// ------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+    // Cargar productos si estamos en index.html
+    if (document.getElementById("productos")) {
+        cargarProductos();
+    }
+
+    // Mostrar carrito si estamos en cart.html
+    if (document.getElementById("carrito")) {
+        mostrarCarrito();
+        const botonFinalizar = document.getElementById("finalizar");
+        if (botonFinalizar) botonFinalizar.addEventListener("click", finalizarCompra);
+    }
+
+    // Registro
+    const registerForm = document.getElementById("registerForm");
+    if (registerForm) registerForm.addEventListener("submit", registrarUsuario);
+
+    // Login
+    const loginForm = document.getElementById("loginForm");
+    if (loginForm) loginForm.addEventListener("submit", loginUsuario);
+});
+// ...existing code...

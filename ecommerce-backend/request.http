@@ -120,3 +120,34 @@ Content-Type: application/json
 
 # Eliminar producto
 DELETE http://127.0.0.1:8000/api/products/9
+
+### =====================================================
+### USUARIOS
+### =====================================================
+
+# Registrar usuario
+POST http://127.0.0.1:8000/api/users/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "123456",
+  "role": "user"
+}
+
+###
+
+# Login usuario
+POST http://127.0.0.1:8000/api/users/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "123456"
+}
+
+###
+
+# Listar todos los usuarios (si tu endpoint lo permite)
+GET http://127.0.0.1:8000/api/users/
+Accept: application/json
