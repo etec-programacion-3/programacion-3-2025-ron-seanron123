@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
-from pydantic import BaseModel, constr
+from pydantic import BaseModel
+import hashlib
 
 from app.models.user import User
 from app.database import get_db
@@ -11,13 +11,19 @@ router = APIRouter(
     tags=["users"]
 )
 
-# 🔹 Configuración de PassLib para bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# 🔹 Función para hashear contraseñas con SHA256
+def hash_password(password: str) -> str:
+    """Hashea la contraseña usando SHA256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verifica si la contraseña coincide con el hash"""
+    return hash_password(plain_password) == hashed_password
 
 # 🔹 Schemas Pydantic para validar datos de entrada
 class UserCreateSafe(BaseModel):
     username: str
-    password: constr(max_length=72)  # 🔹 Limita a 72 caracteres para bcrypt
+    password: str
     role: str
 
 class UserResponse(BaseModel):
@@ -40,7 +46,7 @@ def register(user: UserCreateSafe, db: Session = Depends(get_db)):
         )
     
     # 🔹 Hashea la contraseña de manera segura
-    hashed_pw = pwd_context.hash(user.password)
+    hashed_pw = hash_password(user.password)
     
     # 🔹 Crea el nuevo usuario
     new_user = User(
@@ -68,13 +74,13 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
             detail="Usuario o contraseña incorrectos"
         )
     # 🔹 Verifica contraseña
-    if not pwd_context.verify(user.password, db_user.password):
+    if not verify_password(user.password, db_user.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Usuario o contraseña incorrectos"
         )
 
-    # ✅ AHORA DEVUELVE EL ROLE
+    # ✅ AHORA DEVUELVE EL ROLE (ESTO ESTABA FALTANDO)
     return {
         "message": "Login exitoso", 
         "user_id": db_user.id,
