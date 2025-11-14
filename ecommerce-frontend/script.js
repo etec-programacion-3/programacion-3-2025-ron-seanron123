@@ -102,6 +102,10 @@ async function finalizarCompra() {
     const orderData = {
         items: carrito.map(item => ({ product_id: item.id, quantity: item.cantidad }))
     };
+    // Si hay un usuario autenticado, incluir su id en la orden para asociarla
+    if (usuario && usuario.user_id) {
+        orderData.user_id = usuario.user_id;
+    }
 
     try {
         const storedToken = localStorage.getItem("token");
@@ -181,7 +185,8 @@ async function loginUsuario(event) {
         if (res.ok) {
             // Guardar token devuelto por el backend (o fallback al fake token)
             const token = data.token || "fake-jwt-token";
-            usuario = { username, role: data.role, token };
+            // Guardar también el user_id si el backend lo devuelve
+            usuario = { username, role: data.role, token, user_id: data.user_id };
             localStorage.setItem("usuario", JSON.stringify(usuario));
             localStorage.setItem("token", token);
             alert(data.message || "Login exitoso");
@@ -198,6 +203,41 @@ async function loginUsuario(event) {
 // ------------------------------
 // EVENTOS
 // ------------------------------
+// ------------------------------
+// AUTENTICACIÓN / NAVEGACIÓN
+// ------------------------------
+function verificarAutenticacion() {
+    // Actualiza la variable global `usuario` desde localStorage
+    usuario = JSON.parse(localStorage.getItem("usuario")) || null;
+    return !!usuario;
+}
+
+function actualizarNavegacion() {
+    const loginLink = document.getElementById("loginLink");
+    if (!loginLink) return;
+
+    if (usuario) {
+        // Mostrar nombre y botón de logout
+        loginLink.innerHTML = `
+            <span style="color: white; margin-right:10px;">${usuario.username || ''}</span>
+            <button id="logoutBtn" style="background:#e53e3e;color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer">Cerrar sesión</button>
+        `;
+        const btn = document.getElementById("logoutBtn");
+        if (btn) {
+            btn.addEventListener("click", () => {
+                localStorage.removeItem("usuario");
+                localStorage.removeItem("token");
+                usuario = null;
+                actualizarNavegacion();
+                // redirigir al inicio
+                window.location.href = "index.html";
+            });
+        }
+    } else {
+        loginLink.innerHTML = `<a href="login.html">Login</a>`;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Cargar productos si estamos en index.html
     if (document.getElementById("productos")) {

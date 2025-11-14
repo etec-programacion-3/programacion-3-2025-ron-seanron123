@@ -32,9 +32,23 @@ body {
     }
 
     nav {
+      background-color: #2b6cb0;
+      padding: 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    
+    nav a:hover {
+      background-color: #1a4d8f;
     }
 
     .logo {
@@ -175,3 +189,18 @@ body {
 .muted { color:#666; margin-top:0.75rem; }
 
 .container { padding: 1rem 2rem; }
+
+    #loginLink button {
+      background-color: #e53e3e;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background-color 0.3s;
+    }
+    
+    #loginLink button:hover {
+      background-color: #c53030;
+    }

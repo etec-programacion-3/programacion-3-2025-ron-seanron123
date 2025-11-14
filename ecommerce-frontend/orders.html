@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Mis Pedidos - E-commerce</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style.css">
   <style>
     .orders-container {
       max-width: 900px;
@@ -147,16 +147,18 @@
   </style>
 </head>
 <body>
-  <nav>
-    <div>
-      <a href="index.html">🏠 Inicio</a>
-      <a href="cart.html">🛒 Carrito</a>
-      <a href="orders.html">📦 Mis Pedidos</a>
-    </div>
-    <div id="loginLink">
-      <a href="login.html">Login</a>
-    </div>
-  </nav>
+  <header>
+    <nav>
+      <div>
+        <a href="index.html">🏠 Inicio</a>
+        <a href="cart.html">🛒 Carrito</a>
+        <a href="orders.html">📦 Mis Pedidos</a>
+      </div>
+      <div id="loginLink">
+        <a href="login.html">Login</a>
+      </div>
+    </nav>
+  </header>
 
   <div class="orders-container">
     <h1>📦 Historial de Pedidos</h1>
@@ -174,7 +176,9 @@
       const container = document.getElementById('ordersContainer');
       
       try {
-        const res = await fetch(`${API_URL}/orders/`);
+  // Si el cliente está autenticado, pedir solo sus pedidos
+  const query = (typeof usuario !== 'undefined' && usuario && usuario.user_id) ? `?user_id=${usuario.user_id}` : '';
+  const res = await fetch(`${API_URL}/orders/${query}`);
         
         if (!res.ok) {
           throw new Error('Error al cargar órdenes');
@@ -241,11 +245,23 @@
       }
     }
     
-    // Cargar órdenes al cargar la página
+    // Cargar órdenes al cargar la página.
+    // Evitamos ReferenceError si por algún motivo el script principal no se ha cargado
+    // (por cacheo o por orden de carga). Esperamos hasta que las funciones estén disponibles.
+    function whenReady(fn) {
+      if (typeof verificarAutenticacion === 'function' && typeof actualizarNavegacion === 'function') {
+        fn();
+      } else {
+        setTimeout(() => whenReady(fn), 50);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      verificarAutenticacion();
-      actualizarNavegacion();
-      cargarOrdenes();
+      whenReady(() => {
+        verificarAutenticacion();
+        actualizarNavegacion();
+        cargarOrdenes();
+      });
     });
   </script>
 </body>
