@@ -23,7 +23,7 @@ Parte A — Backend (instalación y ejecución)
 1) Abrir terminal y ubicarse en la carpeta del backend
 - Windows (PowerShell)
   ```powershell
-  cd c:\Users\jeanp\Documents\programacion-3-2025-ron-seanron123\ecommerce-backend
+  cd c:\ruta\a\tu\proyecto\ecommerce-backend
   ```
 - Linux / macOS (bash)
   ```bash
