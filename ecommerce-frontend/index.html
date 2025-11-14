@@ -1,19 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
+ <head>
   <meta charset="UTF-8">
-  <title>E-commerce - Productos</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <h1>Tienda de Productos</h1>
-  <nav>
-    <a href="cart.html">🛒 Ver Carrito</a>
-    <a href="login.html" id="loginLink">Login</a>
-  </nav>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ecommerce - Tienda</title>
+  <link rel="stylesheet" href="style.css">
+ </head>
+ <body>
+  <header>
+   <nav>
+    <div>
+      <a href="index.html">🏠 Inicio</a>
+      <a href="cart.html">🛒 Carrito</a>
+      <a href="orders.html">📦 Mis Pedidos</a>
+    </div>
+    <div id="loginLink">
+      <a href="login.html">Login</a>
+    </div>
+   </nav>
+  </header>
 
-  <div id="productos"></div>
+  <main>
+   <section class="hero">
+    <div class="container">
+     <h1 id="main-title">Tienda</h1>
+     <p class="subtitle">Nuestros productos destacados</p>
+     <button class="cta-button" id="cta-button">Ver Productos</button>
+    </div>
+   </section>
+
+   <section class="content-section">
+    <div class="container">
+     <div class="section-header">
+      <h2 id="section-title">Productos</h2>
+      <p id="section-description">Selecciona entre nuestros productos disponibles</p>
+     </div>
+
+     <div id="productos" class="products-grid">
+      <!-- Productos inyectados por script.js -->
+     </div>
+    </div>
+   </section>
+  </main>
+
+  <footer>
+   <div class="container">
+    <p>© 2025 ecommerce. Todos los derechos reservados.</p>
+   </div>
+  </footer>
 
   <script src="script.js"></script>
-</body>
+  <script>
+    document.getElementById('cta-button').addEventListener('click', function(){
+      document.getElementById('productos').scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+ </body>
 </html>
+

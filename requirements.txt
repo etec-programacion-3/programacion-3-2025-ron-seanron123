@@ -1,0 +1,16 @@
+# Requirements for the backend (Python)
+# Versions chosen to be conservative and compatible with FastAPI + SQLAlchemy setups.
+fastapi==0.95.2
+uvicorn[standard]==0.21.1
+SQLAlchemy==1.4.49
+alembic==1.11.1
+python-dotenv==0.21.1
+pydantic==1.10.12
+requests==2.31.0
+
+# Optional / dev
+pytest==7.4.0
+
+# Password hashing and auth
+passlib[bcrypt]==1.7.4
+bcrypt==5.0.0

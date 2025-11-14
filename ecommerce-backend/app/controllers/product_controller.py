@@ -1,6 +1,6 @@
 from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
-from app.models.product import Product
+from app.models.models import Product
 from app.database import get_db
 
 # Obtener todos los productos

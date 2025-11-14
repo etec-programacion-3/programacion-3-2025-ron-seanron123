@@ -4,21 +4,43 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar Sesión</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Iniciar Sesión</h2>
-  <form id="loginForm">
-    <label for="email">Correo electrónico:</label><br>
-    <input type="email" id="email" required><br><br>
+  <header>
+    <nav>
+      <div>
+        <a href="index.html">🏠 Inicio</a>
+        <a href="cart.html">🛒 Carrito</a>
+        <a href="orders.html">📦 Mis Pedidos</a>
+      </div>
+      <div id="loginLink">
+        <a href="login.html">Login</a>
+      </div>
+    </nav>
+  </header>
 
-    <label for="password">Contraseña:</label><br>
-    <input type="password" id="password" required><br><br>
+  <main class="container">
+    <section class="auth-container" aria-labelledby="login-title">
+      <h2 id="login-title">Iniciar Sesión</h2>
+      <form id="loginForm" class="auth-form">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" required>
 
-    <button type="submit">Entrar</button>
-  </form>
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" required>
 
-  <p>¿No tienes cuenta? <a href="register.html">Regístrate aquí</a></p>
+        <button type="submit" class="cta-button">Entrar</button>
+      </form>
 
-    <script src="script.js"></script>
+      <p class="muted">¿No tienes cuenta? <a href="register.html">Regístrate aquí</a></p>
+    </section>
+  </main>
+
+  <footer>
+  <div class="container"><p>© ecommerce</p></div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

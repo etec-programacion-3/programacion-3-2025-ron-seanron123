@@ -2,10 +2,32 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compra Exitosa</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🎉 ¡Compra realizada con éxito!</h1>
-  <a href="index.html">Volver a la tienda</a>
+  <header>
+    <nav>
+      <div>
+        <a href="index.html">🏠 Inicio</a>
+        <a href="cart.html">🛒 Carrito</a>
+        <a href="orders.html">📦 Mis Pedidos</a>
+      </div>
+      <div id="loginLink">
+        <a href="login.html">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container" style="padding:4rem 0; text-align:center">
+    <h1>🎉 ¡Compra realizada con éxito!</h1>
+    <p class="muted" style="margin:1rem 0">Gracias por tu compra. Tu pedido está en proceso.</p>
+    <a href="index.html" class="cta-button">Volver a la tienda</a>
+  </main>
+
+  <footer>
+  <div class="container"><p>© ecommerce</p></div>
+  </footer>
 </body>
 </html>

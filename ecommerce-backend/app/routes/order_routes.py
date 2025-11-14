@@ -41,4 +41,19 @@ def create_order(order_data: OrderCreate, db: Session = Depends(get_db)):
 
     db.commit()
     db.refresh(new_order)
-    return new_order
+    # Construir una respuesta serializable (dict) para evitar errores de validación
+    items_resp = [
+        {
+            "product_id": it.product_id,
+            "quantity": it.quantity,
+            "price": it.price,
+        }
+        for it in new_order.items
+    ]
+
+    return {
+        "id": new_order.id,
+        "user_id": new_order.user_id,
+        "status": new_order.status,
+        "items": items_resp,
+    }

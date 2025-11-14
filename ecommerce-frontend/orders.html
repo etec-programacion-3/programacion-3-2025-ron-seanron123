@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis Pedidos - E-commerce</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .orders-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    
+    .order-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .order-id {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2b6cb0;
+    }
+    
+    .order-status {
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    .status-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-completed {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .order-item:last-child {
+      border-bottom: none;
+    }
+    
+    .order-total {
+      text-align: right;
+      font-size: 20px;
+      font-weight: bold;
+      color: #2b6cb0;
+      margin-top: 15px;
+    }
+    
+    .no-orders {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .no-orders h2 {
+      color: #2b6cb0;
+      margin-bottom: 15px;
+    }
+    
+    .no-orders p {
+      color: #666;
+      margin-bottom: 25px;
+      font-size: 16px;
+    }
+    
+    .no-orders a {
+      display: inline-block;
+      background-color: #2b6cb0;
+      color: white;
+      padding: 12px 30px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .no-orders a:hover {
+      background-color: #1a4d8f;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    nav {
+      background-color: #2b6cb0;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    
+    nav a:hover {
+      background-color: #1a4d8f;
+    }
+    
+    #loginLink button {
+      background-color: #e53e3e;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background-color 0.3s;
+    }
+    
+    #loginLink button:hover {
+      background-color: #c53030;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div>
+        <a href="index.html">🏠 Inicio</a>
+        <a href="cart.html">🛒 Carrito</a>
+        <a href="orders.html">📦 Mis Pedidos</a>
+      </div>
+      <div id="loginLink">
+        <a href="login.html">Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="orders-container">
+    <h1>📦 Historial de Pedidos</h1>
+    <div id="ordersContainer">
+      <div class="loading">
+        <p>Cargando pedidos...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Función para cargar las órdenes
+    async function cargarOrdenes() {
+      const container = document.getElementById('ordersContainer');
+      
+      try {
+  // Si el cliente está autenticado, pedir solo sus pedidos
+  const query = (typeof usuario !== 'undefined' && usuario && usuario.user_id) ? `?user_id=${usuario.user_id}` : '';
+  const res = await fetch(`${API_URL}/orders/${query}`);
+        
+        if (!res.ok) {
+          throw new Error('Error al cargar órdenes');
+        }
+        
+        const orders = await res.json();
+        
+        // Si no hay pedidos en el sistema
+        if (orders.length === 0) {
+          container.innerHTML = `
+            <div class="no-orders">
+              <h2>🛍️ Aún no has realizado ninguna compra</h2>
+              <p>Explora nuestro catálogo y encuentra los productos que más te gusten.</p>
+              <a href="index.html">Ir a la tienda</a>
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = '';
+        
+        // Mostrar cada orden
+        orders.forEach(order => {
+          const total = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+          
+          const orderCard = document.createElement('div');
+          orderCard.className = 'order-card';
+          
+          orderCard.innerHTML = `
+            <div class="order-header">
+              <div class="order-id">Pedido #${order.id}</div>
+              <div class="order-status status-${order.status}">
+                ${order.status === 'pending' ? '⏳ Pendiente' : '✅ Completado'}
+              </div>
+            </div>
+            
+            <div class="order-items">
+              ${order.items.map(item => `
+                <div class="order-item">
+                  <span><strong>Producto ID:</strong> ${item.product_id}</span>
+                  <span><strong>Cantidad:</strong> ${item.quantity}</span>
+                  <span><strong>Subtotal:</strong> $${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+              `).join('')}
+            </div>
+            
+            <div class="order-total">
+              Total: $${total.toFixed(2)}
+            </div>
+          `;
+          
+          container.appendChild(orderCard);
+        });
+        
+      } catch (error) {
+        console.error('Error al cargar órdenes:', error);
+        container.innerHTML = `
+          <div class="no-orders">
+            <h2>❌ Error al cargar pedidos</h2>
+            <p>No se pudieron cargar tus pedidos. Por favor, verifica que el servidor esté corriendo.</p>
+            <a href="index.html">Volver al inicio</a>
+          </div>
+        `;
+      }
+    }
+    
+    // Cargar órdenes al cargar la página.
+    // Evitamos ReferenceError si por algún motivo el script principal no se ha cargado
+    // (por cacheo o por orden de carga). Esperamos hasta que las funciones estén disponibles.
+    function whenReady(fn) {
+      if (typeof verificarAutenticacion === 'function' && typeof actualizarNavegacion === 'function') {
+        fn();
+      } else {
+        setTimeout(() => whenReady(fn), 50);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      whenReady(() => {
+        verificarAutenticacion();
+        actualizarNavegacion();
+        cargarOrdenes();
+      });
+    });
+  </script>
+</body>
+</html>

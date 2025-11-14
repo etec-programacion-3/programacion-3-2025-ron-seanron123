@@ -2,15 +2,38 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carrito de Compras</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Carrito</h1>
-  <div id="carrito"></div>
-  <h2 id="total"></h2>
+  <header>
+    <nav>
+      <div>
+        <a href="index.html">🏠 Inicio</a>
+        <a href="cart.html">🛒 Carrito</a>
+        <a href="orders.html">📦 Mis Pedidos</a>
+      </div>
+      <div id="loginLink">
+        <a href="login.html">Login</a>
+      </div>
+    </nav>
+  </header>
 
-  <button id="finalizar">Finalizar Compra</button>
-  <a href="index.html">⬅️ Volver</a>
+  <main class="container">
+    <h1>Carrito</h1>
+    <div id="carrito"></div>
+    <h2 id="total"></h2>
+
+    <div style="margin-top:1rem">
+      <button id="finalizar" class="cta-button">Finalizar Compra</button>
+      <a href="index.html" style="margin-left:1rem; color:#666; text-decoration:none">⬅️ Volver</a>
+    </div>
+  </main>
+
+  <footer>
+  <div class="container"><p>© ecommerce</p></div>
+  </footer>
 
   <script src="script.js"></script>
 </body>

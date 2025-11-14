@@ -14,7 +14,17 @@ async function cargarProductos() {
     if (!productosDiv) return;
 
     try {
-        const res = await fetch(`${API_URL}/products/`);
+        // Construir headers: preferir token real si existe, si no usar fake token (compatibilidad)
+        const storedToken = localStorage.getItem("token");
+        const headers = { "Accept": "application/json" };
+        if (storedToken) {
+            headers["Authorization"] = `Bearer ${storedToken}`;
+        } else {
+            // Compatibilidad con backend actual
+            headers["x-token"] = "fake-jwt-token";
+        }
+
+        const res = await fetch(`${API_URL}/products/`, { headers });
         const productos = await res.json();
 
         productosDiv.innerHTML = "";
@@ -92,18 +102,28 @@ async function finalizarCompra() {
     const orderData = {
         items: carrito.map(item => ({ product_id: item.id, quantity: item.cantidad }))
     };
+    // Si hay un usuario autenticado, incluir su id en la orden para asociarla
+    if (usuario && usuario.user_id) {
+        orderData.user_id = usuario.user_id;
+    }
 
     try {
+        const storedToken = localStorage.getItem("token");
+        const headers = { "Content-Type": "application/json" };
+        if (storedToken) headers["Authorization"] = `Bearer ${storedToken}`;
+        else headers["x-token"] = "fake-jwt-token";
+
         const res = await fetch(`${API_URL}/orders/`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers,
             body: JSON.stringify(orderData)
         });
 
         if (res.ok) {
             carrito = [];
             localStorage.setItem("carrito", JSON.stringify(carrito));
-            window.location.href = "confirmación.html";
+            // Archivo real: confirmacion.html (sin tilde)
+            window.location.href = "confirmacion.html";
         } else {
             const error = await res.json().catch(() => ({}));
             alert("Error al finalizar compra: " + (error.detail || JSON.stringify(error)));
@@ -120,6 +140,7 @@ async function registrarUsuario(event) {
     event.preventDefault();
     const username = document.getElementById("regEmail").value;
     const password = document.getElementById("regPassword").value;
+    console.log("Registrar usuario:", username);
 
     try {
         const res = await fetch(`${API_URL}/users/register`, {
@@ -128,16 +149,18 @@ async function registrarUsuario(event) {
             body: JSON.stringify({ username, password, role: "user" })
         });
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
 
         if (res.ok) {
-            alert(data.message);
+            // Backend devuelve el objeto de usuario; mostrar mensaje genérico si no hay 'message'
+            alert(data.message || "Registro exitoso");
             window.location.href = "login.html";
         } else {
-            alert(data.detail || "Error al registrar usuario");
+            alert(data.detail || JSON.stringify(data) || "Error al registrar usuario");
         }
     } catch (error) {
         console.error("Error al registrar usuario:", error);
+        alert("Error de red al registrar usuario");
     }
 }
 
@@ -148,6 +171,7 @@ async function loginUsuario(event) {
     event.preventDefault();
     const username = document.getElementById("email").value;
     const password = document.getElementById("password").value;
+    console.log("Login usuario:", username);
 
     try {
         const res = await fetch(`${API_URL}/users/login`, {
@@ -156,23 +180,64 @@ async function loginUsuario(event) {
             body: JSON.stringify({ username, password })
         });
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+        console.log('Login response', res.status, data);
         if (res.ok) {
-            usuario = { username, role: data.role };
+            // Guardar token devuelto por el backend (o fallback al fake token)
+            const token = data.token || "fake-jwt-token";
+            // Guardar también el user_id si el backend lo devuelve
+            usuario = { username, role: data.role, token, user_id: data.user_id };
             localStorage.setItem("usuario", JSON.stringify(usuario));
-            alert(data.message);
+            localStorage.setItem("token", token);
+            alert(data.message || "Login exitoso");
             window.location.href = "index.html";
         } else {
-            alert(data.detail || "Error al iniciar sesión");
+            alert(data.detail || JSON.stringify(data) || "Error al iniciar sesión");
         }
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
+        alert("Error de red al iniciar sesión");
     }
 }
 
 // ------------------------------
 // EVENTOS
 // ------------------------------
+// ------------------------------
+// AUTENTICACIÓN / NAVEGACIÓN
+// ------------------------------
+function verificarAutenticacion() {
+    // Actualiza la variable global `usuario` desde localStorage
+    usuario = JSON.parse(localStorage.getItem("usuario")) || null;
+    return !!usuario;
+}
+
+function actualizarNavegacion() {
+    const loginLink = document.getElementById("loginLink");
+    if (!loginLink) return;
+
+    if (usuario) {
+        // Mostrar nombre y botón de logout
+        loginLink.innerHTML = `
+            <span style="color: white; margin-right:10px;">${usuario.username || ''}</span>
+            <button id="logoutBtn" style="background:#e53e3e;color:white;border:none;padding:6px 10px;border-radius:4px;cursor:pointer">Cerrar sesión</button>
+        `;
+        const btn = document.getElementById("logoutBtn");
+        if (btn) {
+            btn.addEventListener("click", () => {
+                localStorage.removeItem("usuario");
+                localStorage.removeItem("token");
+                usuario = null;
+                actualizarNavegacion();
+                // redirigir al inicio
+                window.location.href = "index.html";
+            });
+        }
+    } else {
+        loginLink.innerHTML = `<a href="login.html">Login</a>`;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Cargar productos si estamos en index.html
     if (document.getElementById("productos")) {
@@ -194,4 +259,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("loginForm");
     if (loginForm) loginForm.addEventListener("submit", loginUsuario);
 });
+
+// If the script loaded after DOMContentLoaded fired, attach handlers immediately
+if (document.readyState !== 'loading') {
+    const registerFormImmediate = document.getElementById("registerForm");
+    if (registerFormImmediate) registerFormImmediate.addEventListener("submit", registrarUsuario);
+    const loginFormImmediate = document.getElementById("loginForm");
+    if (loginFormImmediate) loginFormImmediate.addEventListener("submit", loginUsuario);
+}
 // ...existing code...
