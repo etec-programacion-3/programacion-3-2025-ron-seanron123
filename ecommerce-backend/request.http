@@ -55,7 +55,7 @@ Content-Type: application/json
 ###
 
 # Eliminar categoría
-DELETE http://127.0.0.1:8000/api/categories/3
+DELETE http://127.0.0.1:8000/api/categories/2
 
 ### =====================================================
 ### PRODUCTOS
@@ -104,7 +104,7 @@ Accept: application/json
 ###
 
 # Actualizar producto
-PUT http://127.0.0.1:8000/api/products/1
+PUT http://127.0.0.1:8000/api/products/4
 Content-Type: application/json
 
 {
@@ -119,7 +119,7 @@ Content-Type: application/json
 ###
 
 # Eliminar producto
-DELETE http://127.0.0.1:8000/api/products/9
+DELETE http://127.0.0.1:8000/api/products/4
 
 ### =====================================================
 ### USUARIOS

@@ -1,68 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
+ <head>
   <meta charset="UTF-8">
-  <title>E-commerce - Productos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ecommerce - Tienda</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    nav {
-      background-color: #2b6cb0;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    nav a {
-      color: white;
-      text-decoration: none;
-      padding: 8px 15px;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-    
-    nav a:hover {
-      background-color: #1a4d8f;
-    }
-    
-    #loginLink {
-      display: flex;
-      align-items: center;
-      color: white;
-    }
-    
-    #loginLink button {
-      background-color: #e53e3e;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-left: 10px;
-      transition: background-color 0.3s;
-    }
-    
-    #loginLink button:hover {
-      background-color: #c53030;
-    }
-  </style>
-</head>
-<body>
-  <nav>
-    <div>
-      <a href="index.html">🏠 Inicio</a>
-      <a href="cart.html">🛒 Ver Carrito</a>
-      <a href="orders.html">📦 Mis Pedidos</a>
-    </div>
-    <div id="loginLink">
-      <a href="login.html">Login</a>
-    </div>
-  </nav>
+ </head>
+ <body>
+  <header>
+   <nav class="container">
+    <a href="#" class="logo">ecommerce</a>
+    <ul class="nav-links">
+     <li><a href="cart.html">🛒 Carrito</a></li>
+     <li><a href="login.html" id="loginLink">Login</a></li>
+    </ul>
+   </nav>
+  </header>
 
-  <h1 style="text-align: center; margin-top: 30px;">Tienda de Productos</h1>
-  
-  <div id="productos"></div>
+  <main>
+   <section class="hero">
+    <div class="container">
+     <h1 id="main-title">Tienda</h1>
+     <p class="subtitle">Nuestros productos destacados</p>
+     <button class="cta-button" id="cta-button">Ver Productos</button>
+    </div>
+   </section>
+
+   <section class="content-section">
+    <div class="container">
+     <div class="section-header">
+      <h2 id="section-title">Productos</h2>
+      <p id="section-description">Selecciona entre nuestros productos disponibles</p>
+     </div>
+
+     <div id="productos" class="products-grid">
+      <!-- Productos inyectados por script.js -->
+     </div>
+    </div>
+   </section>
+  </main>
+
+  <footer>
+   <div class="container">
+    <p>© 2025 ecommerce. Todos los derechos reservados.</p>
+   </div>
+  </footer>
 
   <script src="script.js"></script>
-</body>
+  <script>
+    document.getElementById('cta-button').addEventListener('click', function(){
+      document.getElementById('productos').scrollIntoView({ behavior: 'smooth' });
+    });
+  </script>
+ </body>
 </html>
+

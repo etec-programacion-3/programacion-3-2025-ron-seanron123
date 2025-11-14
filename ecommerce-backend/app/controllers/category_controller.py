@@ -1,5 +1,6 @@
 from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.models.models import Category
 from app.database import get_db
 
@@ -16,10 +17,20 @@ def get_category(category_id: int, db: Session = Depends(get_db)):
 
 # Crear nueva categoría
 def create_category(category_data: dict, db: Session = Depends(get_db)):
+    # Verificar si ya existe una categoría con el mismo nombre
+    existing = db.query(Category).filter(Category.name == category_data.get("name")).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="La categoría ya existe")
+
     new_category = Category(**category_data)
     db.add(new_category)
-    db.commit()
-    db.refresh(new_category)
+    try:
+        db.commit()
+        db.refresh(new_category)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Error al crear la categoría: nombre duplicado o datos inválidos")
+
     return new_category
 
 # Actualizar categoría

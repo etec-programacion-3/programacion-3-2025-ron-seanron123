@@ -17,21 +17,13 @@ Base.metadata.create_all(bind=engine)
 # Crear instancia de FastAPI
 app = FastAPI()
 
-# ✅ CONFIGURACIÓN DE CORS MEJORADA
+# Habilitar CORS para que el frontend pueda llamar la API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-        "http://localhost:5501",
-        "http://127.0.0.1:5501",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "*"  # En desarrollo permite todo, en producción quítalo
-    ],
+    allow_origins=["*"],  # ⚠ En producción, poner solo el dominio permitido
     allow_credentials=True,
-    allow_methods=["*"],  # Permite GET, POST, PUT, DELETE, etc.
-    allow_headers=["*"],  # Permite todos los headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Registrar routers
@@ -44,7 +36,3 @@ app.include_router(auth_routes.router)
 @app.get("/")
 def root():
     return {"message": "Backend funcionando correctamente"}
-
-@app.get("/health")
-def health_check():
-    return {"status": "ok", "message": "API funcionando"}

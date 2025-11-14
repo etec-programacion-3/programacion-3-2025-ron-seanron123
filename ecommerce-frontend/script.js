@@ -1,3 +1,4 @@
+// ...existing code...
 // ------------------------------
 // VARIABLES GLOBALES
 // ------------------------------
@@ -6,86 +7,27 @@ let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let usuario = JSON.parse(localStorage.getItem("usuario")) || null;
 
 // ------------------------------
-// VERIFICAR AUTENTICACIÓN
-// ------------------------------
-function verificarAutenticacion() {
-    const paginasPublicas = ['login.html', 'register.html'];
-    const paginaActual = window.location.pathname.split('/').pop();
-    
-    // Si no hay usuario logueado y no está en una página pública
-    if (!usuario && !paginasPublicas.includes(paginaActual)) {
-        console.log("Usuario no autenticado, redirigiendo al login...");
-        window.location.href = "login.html";
-        return false;
-    }
-    
-    return true;
-}
-
-// ------------------------------
-// ACTUALIZAR UI SEGÚN USUARIO
-// ------------------------------
-function actualizarNavegacion() {
-    const loginLink = document.getElementById("loginLink");
-    
-    if (loginLink) {
-        if (usuario) {
-            // Usuario logueado: mostrar nombre y botón de cerrar sesión
-            loginLink.innerHTML = `
-                ${usuario.username} 
-                <button onclick="cerrarSesion()" style="margin-left: 10px; padding: 5px 10px; cursor: pointer;">
-                    Cerrar Sesión
-                </button>
-            `;
-            loginLink.removeAttribute('href');
-        } else {
-            // Usuario no logueado: mostrar link de login
-            loginLink.textContent = "Login";
-            loginLink.href = "login.html";
-        }
-    }
-}
-
-// ------------------------------
-// CERRAR SESIÓN
-// ------------------------------
-function cerrarSesion() {
-    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
-        localStorage.removeItem("usuario");
-        localStorage.removeItem("carrito");
-        usuario = null;
-        carrito = [];
-        alert("Sesión cerrada exitosamente");
-        window.location.href = "login.html";
-    }
-}
-
-// ------------------------------
 // INDEX.HTML - MOSTRAR PRODUCTOS
 // ------------------------------
 async function cargarProductos() {
     const productosDiv = document.getElementById("productos");
     if (!productosDiv) return;
 
-    // Verificar autenticación antes de cargar productos
-    if (!verificarAutenticacion()) return;
-
     try {
-        const res = await fetch(`${API_URL}/products/`);
-        
-        if (!res.ok) {
-            throw new Error(`Error HTTP: ${res.status}`);
+        // Construir headers: preferir token real si existe, si no usar fake token (compatibilidad)
+        const storedToken = localStorage.getItem("token");
+        const headers = { "Accept": "application/json" };
+        if (storedToken) {
+            headers["Authorization"] = `Bearer ${storedToken}`;
+        } else {
+            // Compatibilidad con backend actual
+            headers["x-token"] = "fake-jwt-token";
         }
-        
+
+        const res = await fetch(`${API_URL}/products/`, { headers });
         const productos = await res.json();
 
         productosDiv.innerHTML = "";
-        
-        if (productos.length === 0) {
-            productosDiv.innerHTML = "<p>No hay productos disponibles. Ejecuta el script seed.py para agregar productos de prueba.</p>";
-            return;
-        }
-
         productos.forEach(producto => {
             const card = document.createElement("div");
             card.classList.add("card");
@@ -101,7 +43,6 @@ async function cargarProductos() {
         });
     } catch (error) {
         console.error("Error al cargar productos:", error);
-        productosDiv.innerHTML = "<p>Error al cargar productos. Verifica que el servidor esté corriendo.</p>";
     }
 }
 
@@ -127,17 +68,8 @@ function mostrarCarrito() {
     const totalDiv = document.getElementById("total");
     if (!carritoDiv) return;
 
-    // Verificar autenticación
-    if (!verificarAutenticacion()) return;
-
     carritoDiv.innerHTML = "";
     let total = 0;
-
-    if (carrito.length === 0) {
-        carritoDiv.innerHTML = "<p>El carrito está vacío</p>";
-        if (totalDiv) totalDiv.innerText = "Total: $0.00";
-        return;
-    }
 
     carrito.forEach(item => {
         const itemDiv = document.createElement("div");
@@ -172,15 +104,21 @@ async function finalizarCompra() {
     };
 
     try {
+        const storedToken = localStorage.getItem("token");
+        const headers = { "Content-Type": "application/json" };
+        if (storedToken) headers["Authorization"] = `Bearer ${storedToken}`;
+        else headers["x-token"] = "fake-jwt-token";
+
         const res = await fetch(`${API_URL}/orders/`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers,
             body: JSON.stringify(orderData)
         });
 
         if (res.ok) {
             carrito = [];
             localStorage.setItem("carrito", JSON.stringify(carrito));
+            // Archivo real: confirmacion.html (sin tilde)
             window.location.href = "confirmacion.html";
         } else {
             const error = await res.json().catch(() => ({}));
@@ -188,7 +126,6 @@ async function finalizarCompra() {
         }
     } catch (error) {
         console.error("Error al enviar orden:", error);
-        alert("Error al conectar con el servidor");
     }
 }
 
@@ -199,8 +136,7 @@ async function registrarUsuario(event) {
     event.preventDefault();
     const username = document.getElementById("regEmail").value;
     const password = document.getElementById("regPassword").value;
-
-    console.log("Intentando registrar:", username);
+    console.log("Registrar usuario:", username);
 
     try {
         const res = await fetch(`${API_URL}/users/register`, {
@@ -209,18 +145,18 @@ async function registrarUsuario(event) {
             body: JSON.stringify({ username, password, role: "user" })
         });
 
-        const data = await res.json();
-        console.log("Respuesta registro:", data);
+        const data = await res.json().catch(() => ({}));
 
         if (res.ok) {
-            alert("✅ " + (data.message || "Registro exitoso. Ahora puedes iniciar sesión."));
+            // Backend devuelve el objeto de usuario; mostrar mensaje genérico si no hay 'message'
+            alert(data.message || "Registro exitoso");
             window.location.href = "login.html";
         } else {
-            alert("❌ " + (data.detail || "Error al registrar usuario"));
+            alert(data.detail || JSON.stringify(data) || "Error al registrar usuario");
         }
     } catch (error) {
         console.error("Error al registrar usuario:", error);
-        alert("Error al conectar con el servidor. Verifica que esté corriendo en http://127.0.0.1:8000");
+        alert("Error de red al registrar usuario");
     }
 }
 
@@ -231,8 +167,7 @@ async function loginUsuario(event) {
     event.preventDefault();
     const username = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-
-    console.log("Intentando login:", username);
+    console.log("Login usuario:", username);
 
     try {
         const res = await fetch(`${API_URL}/users/login`, {
@@ -241,25 +176,22 @@ async function loginUsuario(event) {
             body: JSON.stringify({ username, password })
         });
 
-        const data = await res.json();
-        console.log("Respuesta login:", data);
-
+        const data = await res.json().catch(() => ({}));
+        console.log('Login response', res.status, data);
         if (res.ok) {
-            // ✅ Guardar usuario con todos los datos
-            usuario = { 
-                username, 
-                user_id: data.user_id,
-                role: data.role 
-            };
+            // Guardar token devuelto por el backend (o fallback al fake token)
+            const token = data.token || "fake-jwt-token";
+            usuario = { username, role: data.role, token };
             localStorage.setItem("usuario", JSON.stringify(usuario));
-            alert("✅ " + (data.message || "Login exitoso"));
+            localStorage.setItem("token", token);
+            alert(data.message || "Login exitoso");
             window.location.href = "index.html";
         } else {
-            alert("❌ " + (data.detail || "Error al iniciar sesión"));
+            alert(data.detail || JSON.stringify(data) || "Error al iniciar sesión");
         }
     } catch (error) {
         console.error("Error al iniciar sesión:", error);
-        alert("Error al conectar con el servidor. Verifica que esté corriendo en http://127.0.0.1:8000");
+        alert("Error de red al iniciar sesión");
     }
 }
 
@@ -267,18 +199,8 @@ async function loginUsuario(event) {
 // EVENTOS
 // ------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("Página cargada");
-    console.log("Usuario actual:", usuario);
-    
-    // Verificar autenticación en todas las páginas
-    verificarAutenticacion();
-    
-    // Actualizar navegación según estado de autenticación
-    actualizarNavegacion();
-    
     // Cargar productos si estamos en index.html
     if (document.getElementById("productos")) {
-        console.log("Cargando productos...");
         cargarProductos();
     }
 
@@ -291,15 +213,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Registro
     const registerForm = document.getElementById("registerForm");
-    if (registerForm) {
-        console.log("Formulario de registro encontrado");
-        registerForm.addEventListener("submit", registrarUsuario);
-    }
+    if (registerForm) registerForm.addEventListener("submit", registrarUsuario);
 
     // Login
     const loginForm = document.getElementById("loginForm");
-    if (loginForm) {
-        console.log("Formulario de login encontrado");
-        loginForm.addEventListener("submit", loginUsuario);
-    }
+    if (loginForm) loginForm.addEventListener("submit", loginUsuario);
 });
+
+// If the script loaded after DOMContentLoaded fired, attach handlers immediately
+if (document.readyState !== 'loading') {
+    const registerFormImmediate = document.getElementById("registerForm");
+    if (registerFormImmediate) registerFormImmediate.addEventListener("submit", registrarUsuario);
+    const loginFormImmediate = document.getElementById("loginForm");
+    if (loginFormImmediate) loginFormImmediate.addEventListener("submit", loginUsuario);
+}
+// ...existing code...

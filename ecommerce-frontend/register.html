@@ -3,202 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro - E-commerce</title>
+  <title>Registro</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    body {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-      font-family: Arial, sans-serif;
-    }
-    
-    .register-container {
-      max-width: 420px;
-      width: 90%;
-      padding: 40px;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    }
-    
-    .register-container h2 {
-      text-align: center;
-      color: #2b6cb0;
-      margin-bottom: 10px;
-      font-size: 28px;
-    }
-    
-    .register-subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 30px;
-      font-size: 14px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    
-    .form-group input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      box-sizing: border-box;
-      transition: border-color 0.3s;
-    }
-    
-    .form-group input:focus {
-      outline: none;
-      border-color: #2b6cb0;
-    }
-    
-    .password-hint {
-      font-size: 12px;
-      color: #666;
-      margin-top: 5px;
-      display: flex;
-      align-items: center;
-    }
-    
-    .password-hint::before {
-      content: "ℹ️";
-      margin-right: 5px;
-    }
-    
-    .btn-register {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 10px;
-    }
-    
-    .btn-register:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-register:active {
-      transform: translateY(0);
-    }
-    
-    .login-link {
-      text-align: center;
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 1px solid #e0e0e0;
-      color: #666;
-      font-size: 14px;
-    }
-    
-    .login-link a {
-      color: #2b6cb0;
-      text-decoration: none;
-      font-weight: bold;
-      transition: color 0.3s;
-    }
-    
-    .login-link a:hover {
-      color: #1a4d8f;
-      text-decoration: underline;
-    }
-    
-    .icon-input {
-      position: relative;
-    }
-    
-    .icon-input::before {
-      content: "👤";
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-    }
-    
-    .icon-input input {
-      padding-left: 45px;
-    }
-    
-    .icon-password {
-      position: relative;
-    }
-    
-    .icon-password::before {
-      content: "🔒";
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-    }
-    
-    .icon-password input {
-      padding-left: 45px;
-    }
-  </style>
 </head>
 <body>
-  <div class="register-container">
-    <h2>📝 Crear Cuenta</h2>
-    <p class="register-subtitle">Únete a nuestra tienda online</p>
-    
-    <form id="registerForm">
-      <div class="form-group icon-input">
+  <header>
+    <nav class="container">
+  <a href="index.html" class="logo">ecommerce</a>
+      <ul class="nav-links">
+        <li><a href="cart.html">🛒 Carrito</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="auth-container" aria-labelledby="register-title">
+      <h2 id="register-title">Registro de Usuario</h2>
+      <form id="registerForm" class="auth-form">
         <label for="regEmail">Correo electrónico</label>
-        <input 
-          type="email" 
-          id="regEmail" 
-          required 
-          placeholder="tucorreo@ejemplo.com"
-          autocomplete="email"
-        >
-      </div>
+        <input type="email" id="regEmail" required>
 
-      <div class="form-group icon-password">
         <label for="regPassword">Contraseña</label>
-        <input 
-          type="password" 
-          id="regPassword" 
-          required 
-          placeholder="Mínimo 6 caracteres"
-          minlength="6"
-          autocomplete="new-password"
-        >
-        <div class="password-hint">
-          La contraseña debe tener al menos 6 caracteres
-        </div>
-      </div>
+        <input type="password" id="regPassword" required>
 
-      <button type="submit" class="btn-register">
-        Crear Cuenta
-      </button>
-    </form>
+        <button type="submit" class="cta-button">Registrar</button>
+      </form>
 
-    <div class="login-link">
-      <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
-    </div>
-  </div>
+      <p class="muted">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+    </section>
+  </main>
+
+  <footer>
+  <div class="container"><p>© ecommerce</p></div>
+  </footer>
 
   <script src="script.js"></script>
 </body>
