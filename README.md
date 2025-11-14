@@ -17,13 +17,41 @@ Prerequisitos
   - REST Client (humao.rest-client) — opcional para `request.http`.
 - (Opcional) Git para control de versiones.
 
+## ⬇️ Configuración Inicial: Clonar el Repositorio
+
+**Propósito:** Obtener una copia local de todo el código fuente del proyecto.
+
+#### 1. Navegar al Repositorio del Proyecto
+
+* Abre la página del proyecto en tu navegador web.
+
+#### 2. Copiar la URL SSH
+
+1.  Haz clic en el botón verde **`< > Code`** (Código).
+2.  Selecciona la pestaña **`SSH`**.
+3.  Copia el enlace que aparece (tendrá un formato similar a `git@github.com:usuario/proyecto.git`).
+
+#### 3. Clonar el Proyecto
+
+* Abre tu terminal (o Git Bash) y ejecuta el siguiente comando, reemplazando el enlace de ejemplo por el que copiaste:
+
+    ```bash
+    git clone git@github.com:usuario/proyecto.git
+    ```
+
+* **Instrucción:** Ahora debes moverte a la carpeta raíz del proyecto clonado:
+    ```bash
+    cd nombre-del-proyecto
+    ```
+
+---
 Instalacion (guía paso a paso, Windows y Linux)
 
 Parte A — Backend (instalación y ejecución)
 1) Abrir terminal y ubicarse en la carpeta del backend
 - Windows (PowerShell)
   ```powershell
-  cd c:\Users\jeanp\Documents\programacion-3-2025-ron-seanron123\ecommerce-backend
+  cd c:\ruta\a\tu\proyecto\ecommerce-backend
   ```
 - Linux / macOS (bash)
   ```bash
