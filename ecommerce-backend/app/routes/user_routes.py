@@ -29,7 +29,7 @@ class UserResponse(BaseModel):
         orm_mode = True
 
 # 🔹 Endpoint de registro
-@router.post("/register", response_model=UserResponse)
+@router.post("/register")
 def register(user: UserCreateSafe, db: Session = Depends(get_db)):
     # 🔹 Verifica si el usuario ya existe
     existing_user = db.query(User).filter(User.username == user.username).first()
@@ -52,7 +52,7 @@ def register(user: UserCreateSafe, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return new_user
+    return {"message": "Usuario registrado exitosamente", "user_id": new_user.id}
 
 # 🔹 Endpoint de login
 class UserLogin(BaseModel):
@@ -74,4 +74,9 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
             detail="Usuario o contraseña incorrectos"
         )
 
-    return {"message": "Login exitoso", "user_id": db_user.id}
+    # ✅ AHORA DEVUELVE EL ROLE
+    return {
+        "message": "Login exitoso", 
+        "user_id": db_user.id,
+        "role": db_user.role
+    }
